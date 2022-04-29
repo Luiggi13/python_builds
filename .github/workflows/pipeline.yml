@@ -1,0 +1,42 @@
+name: Deployment Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
+
+jobs:
+
+  avoid_reduncy:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Cancel Previous Redundant Builds
+        uses: styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token: ${{ github.token }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # in this example, there is a newer version already installed, 3.7.7, so the older version will be downloaded
+        python-version: ['3.8.10']
+    steps:
+    - name: Git pull
+      uses: actions/checkout@v3
+    - name: Set up Py Environment
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+    - name: Deploy to heroku
+      if: ${{ github.event_name == 'push' }}
+      uses: akhileshns/heroku-deploy@v3.12.12
+      with:
+        heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+        heroku_app_name: ${{secrets.HEROKU_APP}}
+        heroku_email: ${{secrets.HEROKU_API_EMAIL}}
+        healthcheck: "https://${{secrets.HEROKU_APP}}.herokuapp.com/healthcheck"
+        rollbackonhealthcheckfailed: true
