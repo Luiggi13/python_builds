@@ -1,10 +1,17 @@
-from fastapi import FastAPI, status
-
+from fastapi import FastAPI, status, Request
+from data.customers_workflows import getCustomers
 app = FastAPI()
 
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+@app.get("/users")
+async def getusers(request: Request):
+    client_host = request.client.host
+    if(request.base_url != 'https://back-ga.herokuapp.com'):
+      return getCustomers()
+    return {"client_host": request.base_url}
   
 @app.get('/healthcheck', status_code=status.HTTP_200_OK)
 def perform_healthcheck():
