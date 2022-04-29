@@ -267,5 +267,5 @@ mockUsers = {
 	"size": 20
 }
 
-def getCustomers():
+def getCustomersMock():
   return mockUsers

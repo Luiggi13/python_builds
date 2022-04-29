@@ -1,6 +1,10 @@
+import os
 from fastapi import FastAPI, status, Request
-from data.customers_workflows import getCustomers
+from data.customers_workflows import getCustomersMock
+from dotenv import load_dotenv
 app = FastAPI()
+
+load_dotenv()
 
 @app.get("/")
 async def root():
@@ -8,9 +12,9 @@ async def root():
 
 @app.get("/users")
 async def getusers(request: Request):
-    if(request.base_url == 'https://back-ga.herokuapp.com/'):
-      return getCustomers()
-    return {"client_host": request.base_url}
+    if str(os.getenv('HEROKU_URL')) in request.url.hostname:
+      return getCustomersMock()
+    return {"message": 'Original products'}
   
 @app.get('/healthcheck', status_code=status.HTTP_200_OK)
 def perform_healthcheck():
