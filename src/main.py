@@ -8,7 +8,7 @@ async def root():
 
 @app.get("/users")
 async def getusers(request: Request):
-    client_host = request.client.host
+    print('request.base_url ==>', request.base_url)
     if(request.base_url != 'https://back-ga.herokuapp.com'):
       return getCustomers()
     return {"client_host": request.base_url}
